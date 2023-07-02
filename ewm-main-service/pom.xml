@@ -9,7 +9,6 @@
 		<version>0.0.1-SNAPSHOT</version>
 	</parent>
 
-	<name>EWM Main Service</name>
 	<artifactId>ewm-main-service</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 
