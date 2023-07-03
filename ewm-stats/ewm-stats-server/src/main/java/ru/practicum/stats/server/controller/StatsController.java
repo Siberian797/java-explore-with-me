@@ -34,7 +34,7 @@ public class StatsController {
             @RequestParam("end") @DateTimeFormat(pattern = CommonConstants.COMMON_JSON_DATETIME_FORMAT) LocalDateTime end,
             @RequestParam(name = "uris", defaultValue = "") List<String> uris,
             @RequestParam(name = "unique", defaultValue = "false") Boolean unique) {
-        log.info("POST-hit has been called");
+        log.info("GET-stats has been called");
         return service.getHits(start, end, uris, unique);
     }
 }
