@@ -30,10 +30,10 @@ public class StatsController {
 
     @GetMapping("/stats")
     public List<EndpointHitResponseDto> getEndpointHits(
-            @RequestParam("start") @DateTimeFormat(pattern = CommonConstants.COMMON_JSON_DATETIME_FORMAT) LocalDateTime start,
-            @RequestParam("end") @DateTimeFormat(pattern = CommonConstants.COMMON_JSON_DATETIME_FORMAT) LocalDateTime end,
-            @RequestParam(name = "uris", defaultValue = "") List<String> uris,
-            @RequestParam(name = "unique", defaultValue = "false") Boolean unique) {
+            @RequestParam @DateTimeFormat(pattern = CommonConstants.COMMON_JSON_DATETIME_FORMAT) LocalDateTime start,
+            @RequestParam @DateTimeFormat(pattern = CommonConstants.COMMON_JSON_DATETIME_FORMAT) LocalDateTime end,
+            @RequestParam(defaultValue = "") List<String> uris,
+            @RequestParam(defaultValue = "false") Boolean unique) {
         log.info("GET-stats has been called");
         return service.getHits(start, end, uris, unique);
     }
