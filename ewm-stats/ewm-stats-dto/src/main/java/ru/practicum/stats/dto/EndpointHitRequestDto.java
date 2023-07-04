@@ -13,13 +13,13 @@ import java.time.LocalDateTime;
 @Getter
 public class EndpointHitRequestDto implements Serializable {
     @NotBlank
-    String app;
+    private String app;
     @NotBlank
-    String uri;
+    private String uri;
     @NotBlank
-    String ip;
+    private String ip;
     @NotNull
     @DateTimeFormat(pattern = CommonConstants.COMMON_JSON_DATETIME_FORMAT)
     @JsonFormat(pattern = CommonConstants.COMMON_JSON_DATETIME_FORMAT)
-    LocalDateTime timestamp;
+    private LocalDateTime timestamp;
 }
