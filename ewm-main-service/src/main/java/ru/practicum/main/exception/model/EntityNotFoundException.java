@@ -1,4 +1,4 @@
-package ru.practicum.main.exception;
+package ru.practicum.main.exception.model;
 
 public class EntityNotFoundException extends RuntimeException {
     public EntityNotFoundException(String entity, Long id) {
