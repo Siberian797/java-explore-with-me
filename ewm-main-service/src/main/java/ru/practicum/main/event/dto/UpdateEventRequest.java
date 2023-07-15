@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 
 @Value
 @Builder
-public class UpdateEventRequest<StateAction> {
+public class UpdateEventRequest<S> {
     @Size(min = 20, max = 2000)
     String annotation;
 
@@ -31,7 +31,7 @@ public class UpdateEventRequest<StateAction> {
 
     Boolean requestModeration;
 
-    StateAction stateAction;
+    S stateAction;
 
     @Size(min = 3, max = 120)
     String title;
