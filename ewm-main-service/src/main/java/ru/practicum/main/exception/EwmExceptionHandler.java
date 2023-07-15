@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import ru.practicum.main.exception.dto.ExceptionResponse;
+import ru.practicum.main.exception.model.EntityConflictException;
 import ru.practicum.main.exception.model.EntityNotFoundException;
 
 @RestControllerAdvice("ru.practicum.main")
@@ -15,6 +16,16 @@ public class EwmExceptionHandler {
         return ExceptionResponse.builder()
                 .message(e.getMessage())
                 .reason("Not found")
+                .status(HttpStatus.NOT_FOUND.toString())
+                .build();
+    }
+
+    @ExceptionHandler(EntityConflictException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ExceptionResponse handleEntityConflictException(EntityConflictException e) {
+        return ExceptionResponse.builder()
+                .message(e.getMessage())
+                .reason("Conflict")
                 .status(HttpStatus.NOT_FOUND.toString())
                 .build();
     }

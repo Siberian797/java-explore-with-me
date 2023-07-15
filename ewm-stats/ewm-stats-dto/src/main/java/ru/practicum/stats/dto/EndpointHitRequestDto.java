@@ -1,6 +1,7 @@
 package ru.practicum.stats.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import lombok.Builder;
 import lombok.Getter;
 import org.springframework.format.annotation.DateTimeFormat;
 import ru.practicum.stats.dto.utils.CommonConstants;
@@ -11,6 +12,7 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 
 @Getter
+@Builder
 public class EndpointHitRequestDto implements Serializable {
     @NotBlank
     private String app;
