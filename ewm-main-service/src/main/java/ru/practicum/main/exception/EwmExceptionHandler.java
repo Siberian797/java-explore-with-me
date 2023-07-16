@@ -34,7 +34,7 @@ public class EwmExceptionHandler {
 
     @ExceptionHandler(EntityNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ExceptionResponse handleBadRequest(MissingServletRequestParameterException e) {
+    public ExceptionResponse handleBadRequest(EntityNotValidException e) {
         return ExceptionResponse.builder()
                 .message(e.getMessage())
                 .status(HttpStatus.BAD_REQUEST.toString())
