@@ -15,11 +15,11 @@ import java.util.Map;
 @Service
 public class StatsClient extends BaseClient {
     @Autowired
-    public StatsClient(@Value("${stats-server-url}") String serverUrl, RestTemplateBuilder builder) {
-        super(builder.uriTemplateHandler(new DefaultUriBuilderFactory(serverUrl))
+    public StatsClient(@Value("http://stats-server:9090") String serverUrl, RestTemplateBuilder builder) {
+        super(builder
+                .uriTemplateHandler(new DefaultUriBuilderFactory(serverUrl))
                 .requestFactory(HttpComponentsClientHttpRequestFactory::new)
-                .build()
-        );
+                .build());
     }
 
     public ResponseEntity<Object> createEndpointHit(EndpointHitRequestDto endpointHitRequestDto) {
@@ -31,7 +31,8 @@ public class StatsClient extends BaseClient {
                 "uris", String.join(",", uris),
                 "unique", unique,
                 "start", start,
-                "end", end);
+                "end", end
+        );
 
         return get("/stats?start={start}&end={end}&uris={uris}&unique={unique}", parameters);
     }

@@ -18,13 +18,12 @@ import ru.practicum.main.request.repository.RequestRepository;
 import ru.practicum.main.user.model.User;
 import ru.practicum.main.user.repository.UserRepository;
 import ru.practicum.main.utils.CommonConstants;
+import ru.practicum.main.utils.CommonUtils;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
-
-import static ru.practicum.main.utils.CommonUtils.checkAndReturnUser;
 
 @Service
 @Transactional(readOnly = true)
@@ -36,7 +35,7 @@ public class RequestServiceImpl implements RequestService {
 
     @Override
     public List<ParticipationRequestDto> getAllRequests(Long userId) {
-        checkAndReturnUser(userRepository, userId);
+        CommonUtils.checkAndReturnUser(userRepository, userId);
         List<Request> requests = requestRepository.findByRequesterId(userId);
         return requests.stream().map(RequestMapper::toDto).collect(Collectors.toList());
     }
@@ -45,7 +44,7 @@ public class RequestServiceImpl implements RequestService {
     @Transactional
     public ParticipationRequestDto createRequest(Long userId, Long eventId) {
         Event event = checkAndReturnEvent(eventRepository, eventId);
-        User user = checkAndReturnUser(userRepository, userId);
+        User user = CommonUtils.checkAndReturnUser(userRepository, userId);
 
         if (Boolean.TRUE.equals(requestRepository.existsByEventIdAndRequesterId(event.getId(), userId))) {
             throw new EntityConflictException("request", event.getId());
@@ -74,7 +73,7 @@ public class RequestServiceImpl implements RequestService {
     @Override
     @Transactional
     public ParticipationRequestDto cancelUserRequest(Long userId, Long requestId) {
-        User user = checkAndReturnUser(userRepository, userId);
+        User user = CommonUtils.checkAndReturnUser(userRepository, userId);
         Request request = checkAndReturnRequest(requestId);
 
         if (!user.getId().equals(request.getRequester().getId())) {

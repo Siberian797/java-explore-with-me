@@ -1,6 +1,7 @@
 package ru.practicum.main.event.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -26,6 +27,7 @@ import ru.practicum.main.user.mapper.UserMapper;
 import ru.practicum.main.user.model.User;
 import ru.practicum.main.user.repository.UserRepository;
 import ru.practicum.main.utils.CommonConstants;
+import ru.practicum.main.utils.CommonUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
@@ -35,8 +37,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
-
-import static ru.practicum.main.utils.CommonUtils.*;
 
 @Service
 @RequiredArgsConstructor
@@ -48,11 +48,11 @@ public class EventServiceImpl implements EventService {
     private final EventRepository eventRepository;
     private final UserRepository userRepository;
     private final CategoryRepository categoryRepository;
-    private final StatsClient statsClient;
+    private final StatsClient statsClient = new StatsClient("http://stats-server:9090", new RestTemplateBuilder());
 
     @Override
     public EventFullDto readPublicEvent(Long eventId, HttpServletRequest request) {
-        makePublicEndpointHit(statsClient, request);
+        CommonUtils.makePublicEndpointHit(statsClient, request);
         return parseToFullDtoWithMappers(
                 eventRepository.findByIdAndPublished(eventId).orElseThrow(() -> new EntityNotFoundException("event", eventId)));
     }
@@ -99,7 +99,7 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public List<EventShortDto> getAllEventsForUser(Long userId, PageRequest pageRequest) {
-        checkAndReturnUser(userRepository, userId);
+        CommonUtils.checkAndReturnUser(userRepository, userId);
 
         List<Event> events = eventRepository.getByInitiatorIdOrderByEventDateDesc(userId, pageRequest);
 
@@ -111,7 +111,7 @@ public class EventServiceImpl implements EventService {
     public EventFullDto createEvent(Long userId, NewEventDto newEventDto) {
         checkEventDate(newEventDto.getEventDate());
 
-        User user = checkAndReturnUser(userRepository, userId);
+        User user = CommonUtils.checkAndReturnUser(userRepository, userId);
         Location location = findOrCreateLocation(locationRepository, newEventDto.getLocation());
         Category category = categoryRepository.findById(newEventDto.getCategory())
                 .orElseThrow(() -> new EntityNotFoundException("category", newEventDto.getCategory()));
@@ -160,7 +160,7 @@ public class EventServiceImpl implements EventService {
             String text, List<Long> categories, Boolean paid, LocalDateTime rangeStart, LocalDateTime rangeEnd,
             Boolean onlyAvailable, CommonConstants.EventSort sort, Integer from, Integer size, HttpServletRequest request) {
 
-        makePublicEndpointHit(statsClient, request);
+        CommonUtils.makePublicEndpointHit(statsClient, request);
         PageRequest pageRequest;
         List<Event> events;
 
@@ -201,7 +201,7 @@ public class EventServiceImpl implements EventService {
         String start = LocalDateTime.now().minusYears(10).format(formatter);
         String end = LocalDateTime.now().plusYears(10).format(formatter);
 
-        return getViews(statsClient, start, end, uris, false);
+        return CommonUtils.getViews(statsClient, start, end, uris, false);
     }
 
     private void checkEventState(CommonConstants.EventState state) {
