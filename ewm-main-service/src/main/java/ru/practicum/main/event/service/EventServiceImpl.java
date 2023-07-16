@@ -19,6 +19,7 @@ import ru.practicum.main.event.model.Event;
 import ru.practicum.main.event.repository.EventRepository;
 import ru.practicum.main.exception.model.EntityConflictException;
 import ru.practicum.main.exception.model.EntityNotFoundException;
+import ru.practicum.main.exception.model.EntityNotValidException;
 import ru.practicum.main.location.dto.LocationDto;
 import ru.practicum.main.location.mapper.LocationMapper;
 import ru.practicum.main.location.model.Location;
@@ -159,6 +160,10 @@ public class EventServiceImpl implements EventService {
     public List<EventShortDto> getAllPublicEvents(
             String text, List<Long> categories, Boolean paid, LocalDateTime rangeStart, LocalDateTime rangeEnd,
             Boolean onlyAvailable, CommonConstants.EventSort sort, Integer from, Integer size, HttpServletRequest request) {
+
+        if (rangeEnd.isBefore(rangeStart)) {
+            throw new EntityNotValidException("range", null);
+        }
 
         CommonUtils.makePublicEndpointHit(statsClient, request);
         PageRequest pageRequest;
