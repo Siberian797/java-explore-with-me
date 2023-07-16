@@ -1,0 +1,60 @@
+package ru.practicum.main.utils;
+
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+import lombok.experimental.UtilityClass;
+import org.springframework.http.ResponseEntity;
+import ru.practicum.client.StatsClient;
+import ru.practicum.main.exception.model.EntityNotFoundException;
+import ru.practicum.main.user.model.User;
+import ru.practicum.main.user.repository.UserRepository;
+import ru.practicum.stats.dto.EndpointHitRequestDto;
+import ru.practicum.stats.dto.EndpointHitResponseDto;
+
+import javax.servlet.http.HttpServletRequest;
+import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+@UtilityClass
+public class CommonUtils {
+    private static final Gson gson = new Gson();
+
+    public static User checkAndReturnUser(UserRepository userRepository, Long userId) {
+        return userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException("user", userId));
+    }
+
+    public static void makePublicEndpointHit(StatsClient statsClient, HttpServletRequest request) {
+        statsClient.createEndpointHit(EndpointHitRequestDto.builder()
+                .app("ewm-main-service")
+                .timestamp(LocalDateTime.now())
+                .uri(request.getRequestURI())
+                .ip(request.getRemoteAddr())
+                .build());
+    }
+
+    public static Map<String, Long> getViews(
+            StatsClient statsClient, String start, String end, List<String> uris, Boolean unique
+    ) {
+        ResponseEntity<Object> responseEntity = statsClient.getEndpointStats(start, end, uris, unique);
+
+
+        if (responseEntity.getStatusCode().is2xxSuccessful()) {
+            List<EndpointHitResponseDto> stats =
+                    gson.fromJson(
+                            gson.toJson(responseEntity.getBody()),
+                            new TypeToken<List<EndpointHitResponseDto>>() {
+                            }.getType()
+                    );
+
+            return stats.stream().collect(Collectors.toMap(
+                    EndpointHitResponseDto::getUri,
+                    EndpointHitResponseDto::getHits
+            ));
+        }
+
+        return new HashMap<>();
+    }
+}

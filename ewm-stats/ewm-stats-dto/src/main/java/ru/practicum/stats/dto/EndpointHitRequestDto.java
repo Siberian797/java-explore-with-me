@@ -8,12 +8,11 @@ import ru.practicum.stats.dto.utils.CommonConstants;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-import java.io.Serializable;
 import java.time.LocalDateTime;
 
 @Getter
 @Builder
-public class EndpointHitRequestDto implements Serializable {
+public class EndpointHitRequestDto {
     @NotBlank
     private String app;
     @NotBlank
