@@ -1,9 +1,6 @@
 package ru.practicum.main.compilation.model;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 import ru.practicum.main.event.model.Event;
 
 import javax.persistence.*;
@@ -14,6 +11,8 @@ import java.util.Set;
 @Setter
 @Builder
 @Entity
+@NoArgsConstructor
+@AllArgsConstructor
 @NamedEntityGraph(
         name = Compilation.GRAPH_EVENT,
         attributeNodes = @NamedAttributeNode("events")
