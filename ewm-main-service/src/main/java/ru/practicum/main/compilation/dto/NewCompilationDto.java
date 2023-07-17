@@ -7,13 +7,12 @@ import lombok.Value;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-import java.io.Serializable;
 import java.util.Set;
 
 @Value
 @Builder
 @AllArgsConstructor
-public class NewCompilationDto implements Serializable {
+public class NewCompilationDto {
     @NotNull
     Set<Long> events;
 
