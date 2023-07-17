@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Value;
+import lombok.extern.jackson.Jacksonized;
 import ru.practicum.main.location.dto.LocationDto;
 import ru.practicum.main.utils.CommonConstants;
 
@@ -13,6 +14,7 @@ import java.time.LocalDateTime;
 @Value
 @Builder
 @AllArgsConstructor
+@Jacksonized
 public class UpdateEventRequest<S> {
     @Size(min = 20, max = 2000)
     String annotation;
