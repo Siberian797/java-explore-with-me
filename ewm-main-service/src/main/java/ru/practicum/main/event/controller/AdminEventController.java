@@ -3,18 +3,21 @@ package ru.practicum.main.event.controller;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.main.event.dto.EventFullDto;
 import ru.practicum.main.event.dto.UpdateEventRequest;
 import ru.practicum.main.event.service.EventService;
 import ru.practicum.main.utils.CommonConstants;
 
+import javax.validation.Valid;
 import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
 @RequestMapping("/admin/events")
 @RequiredArgsConstructor
+@Validated
 public class AdminEventController {
     private final EventService eventService;
 
@@ -32,7 +35,7 @@ public class AdminEventController {
 
     @PatchMapping("/{eventId}")
     public EventFullDto updateEventByAdmin(@PathVariable Long eventId,
-                                           @RequestBody UpdateEventRequest<CommonConstants.EventStateAdminAction> updateEventRequest) {
+                                           @RequestBody @Valid UpdateEventRequest<CommonConstants.EventStateAdminAction> updateEventRequest) {
         return eventService.updateAdminEvent(eventId, updateEventRequest);
     }
 }
