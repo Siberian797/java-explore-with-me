@@ -247,7 +247,7 @@ public class EventServiceImpl implements EventService {
 
     private void checkEventDate(LocalDateTime eventDate) {
         if (LocalDateTime.now().plusHours(2).isAfter(eventDate)) {
-            throw new EntityConflictException("eventDate", null);
+            throw new EntityNotValidException("eventDate", null);
         }
     }
 
