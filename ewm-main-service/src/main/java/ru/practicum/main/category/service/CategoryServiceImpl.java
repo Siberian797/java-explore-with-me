@@ -13,6 +13,7 @@ import ru.practicum.main.exception.model.EntityConflictException;
 import ru.practicum.main.exception.model.EntityNotFoundException;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -34,6 +35,9 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public CategoryDto updateCategory(Long categoryId, NewCategoryDto newCategoryDto) {
         Category category = categoryRepository.findById(categoryId).orElseThrow(() -> new EntityNotFoundException("category", categoryId));
+        if (Objects.nonNull(categoryRepository.findByName(newCategoryDto.getName())) && !category.getName().equals(newCategoryDto.getName())) {
+            throw new EntityConflictException("category", categoryId);
+        }
         category.setName(newCategoryDto.getName());
 
         return CategoryMapper.toDto(category);
