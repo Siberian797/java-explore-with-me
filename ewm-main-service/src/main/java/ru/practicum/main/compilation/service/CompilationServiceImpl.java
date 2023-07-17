@@ -83,6 +83,7 @@ public class CompilationServiceImpl implements CompilationService {
         if (events.isEmpty()) {
             return List.of();
         }
+
         return events.stream().map(event ->
                 EventMapper.toShortDto(
                         event,
