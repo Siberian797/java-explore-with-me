@@ -44,8 +44,7 @@ public interface EventRepository extends JpaRepository<Event, Long> {
     );
 
     @Query("SELECT e from Event e " +
-            "where ((:categories) is null or e.category.id in :categories) " +
-            "and e.participantLimit < 845")
+            "where ((:categories) is null or e.category.id in :categories)")
     @EntityGraph(value = Event.GRAPH_EVENT, type = EntityGraph.EntityGraphType.LOAD)
     List<Event> getEventsForUser(
             @Param("categories") List<Long> categories,
