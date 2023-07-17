@@ -7,7 +7,6 @@ import lombok.Value;
 import ru.practicum.main.location.dto.LocationDto;
 import ru.practicum.main.utils.CommonConstants;
 
-import javax.validation.constraints.FutureOrPresent;
 import javax.validation.constraints.Size;
 import java.time.LocalDateTime;
 
@@ -24,7 +23,6 @@ public class UpdateEventRequest<S> {
     String description;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = CommonConstants.COMMON_JSON_DATETIME_FORMAT)
-    @FutureOrPresent
     LocalDateTime eventDate;
 
     LocationDto location;
