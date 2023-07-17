@@ -36,7 +36,7 @@ public class CompilationServiceImpl implements CompilationService {
             throw new EntityConflictException("compilation", null);
         }
 
-        Set<Event> events = eventRepository.getByIdIn(newCompilationDto.getEvents());
+        Set<Event> events = newCompilationDto.getEvents().isEmpty() ? Set.of() : eventRepository.getByIdIn(newCompilationDto.getEvents());
         Compilation compilation = CompilationMapper.toEntity(newCompilationDto, events);
 
         return CompilationMapper.toDto(compilationRepository.save(compilation), parseEventsToDto(events));
