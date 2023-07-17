@@ -17,6 +17,7 @@ import javax.validation.constraints.Positive;
 public class CategoryAdminController {
     private final CategoryService categoryService;
 
+    @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
     public CategoryDto createCategory(@RequestBody @Validated NewCategoryDto newCategoryDto) {
         return categoryService.createCategory(newCategoryDto);
