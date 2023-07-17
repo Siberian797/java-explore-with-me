@@ -16,7 +16,6 @@ public class NewCompilationDto {
     @NotNull
     Set<Long> events;
 
-    @NotNull
     @Builder.Default
     Boolean pinned = false;
 
