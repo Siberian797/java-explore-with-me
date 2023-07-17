@@ -58,8 +58,10 @@ public class RequestServiceImpl implements RequestService {
             throw new EntityConflictException("event", event.getId());
         }
 
-        if (event.getParticipants().size() >= event.getParticipantLimit()) {
-            throw new EntityConflictException("participants", event.getId());
+        if (event.getParticipantLimit() > 0) {
+            if (event.getParticipants().size() >= event.getParticipantLimit()) {
+                throw new EntityConflictException("participants", event.getId());
+            }
         }
 
         return RequestMapper.toDto(requestRepository.save(Request.builder()
