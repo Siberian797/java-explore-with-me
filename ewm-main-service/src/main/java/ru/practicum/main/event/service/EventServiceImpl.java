@@ -71,6 +71,10 @@ public class EventServiceImpl implements EventService {
     @Override
     @Transactional
     public EventFullDto updateAdminEvent(Long eventId, UpdateEventRequest<CommonConstants.EventStateAdminAction> updateEventRequest) {
+        if (updateEventRequest.getEventDate().isAfter(LocalDateTime.now())) {
+            throw new EntityNotValidException("event", null);
+        }
+
         Event event = eventRepository.findById(eventId).orElseThrow(() -> new EntityNotFoundException("event", eventId));
 
         checkEventState(event.getState());
