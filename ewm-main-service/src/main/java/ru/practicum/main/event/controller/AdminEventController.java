@@ -10,7 +10,6 @@ import ru.practicum.main.event.dto.UpdateEventRequest;
 import ru.practicum.main.event.service.EventService;
 import ru.practicum.main.utils.CommonConstants;
 
-import javax.validation.Valid;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -35,7 +34,7 @@ public class AdminEventController {
 
     @PatchMapping("/{eventId}")
     public EventFullDto updateEventByAdmin(@PathVariable Long eventId,
-                                           @RequestBody @Valid UpdateEventRequest<CommonConstants.EventStateAdminAction> updateEventRequest) {
+                                           @RequestBody @Validated UpdateEventRequest<CommonConstants.EventStateAdminAction> updateEventRequest) {
         return eventService.updateAdminEvent(eventId, updateEventRequest);
     }
 }

@@ -8,7 +8,6 @@ import ru.practicum.main.category.dto.CategoryDto;
 import ru.practicum.main.category.dto.NewCategoryDto;
 import ru.practicum.main.category.service.CategoryService;
 
-import javax.validation.Valid;
 import javax.validation.constraints.Positive;
 
 @Validated
@@ -19,7 +18,7 @@ public class CategoryAdminController {
     private final CategoryService categoryService;
 
     @PostMapping
-    public CategoryDto createCategory(@RequestBody @Valid NewCategoryDto newCategoryDto) {
+    public CategoryDto createCategory(@RequestBody @Validated NewCategoryDto newCategoryDto) {
         return categoryService.createCategory(newCategoryDto);
     }
 
@@ -30,7 +29,7 @@ public class CategoryAdminController {
     }
 
     @PatchMapping("/{categoryId}")
-    public CategoryDto updateCategory(@PathVariable @Positive Long categoryId, @RequestBody @Valid NewCategoryDto newCategoryDto) {
+    public CategoryDto updateCategory(@PathVariable @Positive Long categoryId, @RequestBody @Validated NewCategoryDto newCategoryDto) {
         return categoryService.updateCategory(categoryId, newCategoryDto);
     }
 }
