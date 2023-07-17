@@ -80,6 +80,9 @@ public class CompilationServiceImpl implements CompilationService {
     }
 
     private List<EventShortDto> parseEventsToDto(Set<Event> events) {
+        if (events.isEmpty()) {
+            return List.of();
+        }
         return events.stream().map(event ->
                 EventMapper.toShortDto(
                         event,
