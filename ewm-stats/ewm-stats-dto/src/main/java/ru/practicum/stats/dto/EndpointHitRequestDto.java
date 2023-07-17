@@ -23,6 +23,6 @@ public class EndpointHitRequestDto {
     private String ip;
     @NotNull
     @DateTimeFormat(pattern = CommonConstants.COMMON_JSON_DATETIME_FORMAT)
-    @JsonFormat(pattern = CommonConstants.COMMON_JSON_DATETIME_FORMAT)
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = CommonConstants.COMMON_JSON_DATETIME_FORMAT)
     private LocalDateTime timestamp;
 }
