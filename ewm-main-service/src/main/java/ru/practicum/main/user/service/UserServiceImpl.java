@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.practicum.main.exception.model.EntityConflictException;
 import ru.practicum.main.exception.model.EntityNotFoundException;
 import ru.practicum.main.user.dto.NewUserRequestDto;
 import ru.practicum.main.user.dto.UserDto;
@@ -12,6 +13,7 @@ import ru.practicum.main.user.model.User;
 import ru.practicum.main.user.repository.UserRepository;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -29,6 +31,9 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public UserDto createUser(NewUserRequestDto newUserRequestDto) {
+        if (Objects.nonNull(userRepository.findByName(newUserRequestDto.getName()))) {
+            throw new EntityConflictException("user", null);
+        }
         User user = UserMapper.toEntity(newUserRequestDto);
         return UserMapper.toDto(userRepository.save(user));
     }

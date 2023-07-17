@@ -24,6 +24,9 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public CategoryDto createCategory(NewCategoryDto newCategoryDto) {
+        if (Objects.nonNull(categoryRepository.findByName(newCategoryDto.getName()))) {
+            throw new EntityConflictException("category", null);
+        }
         return CategoryMapper.toDto(categoryRepository.save(CategoryMapper.toEntity(newCategoryDto)));
     }
 
