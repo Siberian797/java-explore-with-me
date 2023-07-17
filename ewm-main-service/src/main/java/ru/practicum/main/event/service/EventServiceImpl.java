@@ -202,7 +202,7 @@ public class EventServiceImpl implements EventService {
                 .map(event -> EVENTS_PREFIX + event.getId())
                 .collect(Collectors.toList());
 
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(CommonConstants.COMMON_JSON_DATETIME_FORMAT);
         String start = LocalDateTime.now().minusYears(10).format(formatter);
         String end = LocalDateTime.now().plusYears(10).format(formatter);
 

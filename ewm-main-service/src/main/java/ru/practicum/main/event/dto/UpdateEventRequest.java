@@ -8,13 +8,13 @@ import lombok.extern.jackson.Jacksonized;
 import ru.practicum.main.location.dto.LocationDto;
 import ru.practicum.main.utils.CommonConstants;
 
+import javax.validation.constraints.FutureOrPresent;
 import javax.validation.constraints.Size;
 import java.time.LocalDateTime;
 
 @Value
 @Builder
 @AllArgsConstructor
-@Jacksonized
 public class UpdateEventRequest<S> {
     @Size(min = 20, max = 2000)
     String annotation;
@@ -25,6 +25,7 @@ public class UpdateEventRequest<S> {
     String description;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = CommonConstants.COMMON_JSON_DATETIME_FORMAT)
+    @FutureOrPresent
     LocalDateTime eventDate;
 
     LocationDto location;
