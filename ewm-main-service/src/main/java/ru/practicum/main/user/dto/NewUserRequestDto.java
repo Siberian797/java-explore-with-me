@@ -15,10 +15,10 @@ import javax.validation.constraints.Size;
 public class NewUserRequestDto {
     @NotNull
     @Email
-    @Size(min = 1, max = 256)
+    @Size(min = 6, max = 254)
     String email;
 
     @NotBlank
-    @Size(min = 1, max = 256)
+    @Size(min = 2, max = 250)
     String name;
 }
