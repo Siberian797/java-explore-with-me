@@ -191,8 +191,7 @@ public class EventServiceImpl implements EventService {
             events =
                     eventRepository.getAvailableEventsForUser(text, categories, paid, rangeStart, rangeEnd, pageRequest);
         } else {
-            //List<Event> allEvents = eventRepository.findAll().stream().filter(elt -> elt.getCategory().getId() == 54L).collect(Collectors.toList());
-            events = eventRepository.findAll().stream().filter(elt -> categories.contains(elt.getCategory().getId())).collect(Collectors.toList());//eventRepository.getEventsForUser(text, categories, paid, rangeStart, rangeEnd, pageRequest);
+            events = eventRepository.getEventsForUser(categories, pageRequest);
         }
 
         if (sort == CommonConstants.EventSort.VIEWS) {

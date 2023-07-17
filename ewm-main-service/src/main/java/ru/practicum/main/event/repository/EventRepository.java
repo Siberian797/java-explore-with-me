@@ -44,20 +44,11 @@ public interface EventRepository extends JpaRepository<Event, Long> {
     );
 
     @Query("SELECT e from Event e " +
-            "where (UPPER(e.annotation) like UPPER(CONCAT('%',:text,'%')) " +
-            "or UPPER(e.description) like UPPER(CONCAT('%',:text,'%')) or :text is null ) " +
-            "and e.state = 'PUBLISHED' " +
-            "and ((:categories) is null or e.category.id in :categories) " +
-            "and e.paid = :paid " +
-            "and e.eventDate > :rangeStart " +
-            "and e.eventDate <= :rangeEnd")
+            "where ((:categories) is null or e.category.id in :categories) " +
+            "and e.participantLimit < 845")
     @EntityGraph(value = Event.GRAPH_EVENT, type = EntityGraph.EntityGraphType.LOAD)
     List<Event> getEventsForUser(
-            @Param("text") String text,
             @Param("categories") List<Long> categories,
-            @Param("paid") Boolean paid,
-            @Param("rangeStart") LocalDateTime rangeStart,
-            @Param("rangeEnd") LocalDateTime rangeEnd,
             Pageable pageable
     );
 
