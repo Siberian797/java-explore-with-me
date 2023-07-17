@@ -91,7 +91,7 @@ public class EventServiceImpl implements EventService {
                     event.setState(CommonConstants.EventState.CANCELED);
                     break;
                 default:
-                    throw new EntityConflictException("state", null);
+                    throw new EntityNotValidException("event", null);
             }
         });
 
