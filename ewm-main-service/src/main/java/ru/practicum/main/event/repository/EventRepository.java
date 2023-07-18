@@ -70,6 +70,6 @@ public interface EventRepository extends JpaRepository<Event, Long> {
     );
 
 
-    @Query("SELECT e from Event e where e.id = ?1 and e.state = 'PUBLISHED'")
-    Optional<Event> findByIdAndPublished(Long eventId);
+    @Query("SELECT e from Event e where e.id = :eventId and e.state = 'PUBLISHED'")
+    Optional<Event> findByIdAndPublished(@Param("eventId") Long eventId);
 }
