@@ -35,26 +35,12 @@ public class CommonUtils {
                 .build());
     }
 
-    public static Map<String, Long> getViews(
-            StatsClient statsClient, String start, String end, List<String> uris, Boolean unique
-    ) {
+    public static Map<String, Long> getViews(StatsClient statsClient, String start, String end, List<String> uris, Boolean unique) {
         ResponseEntity<Object> responseEntity = statsClient.getEndpointStats(start, end, uris, unique);
-
-
         if (responseEntity.getStatusCode().is2xxSuccessful()) {
-            List<EndpointHitResponseDto> stats =
-                    gson.fromJson(
-                            gson.toJson(responseEntity.getBody()),
-                            new TypeToken<List<EndpointHitResponseDto>>() {
-                            }.getType()
-                    );
-
-            return stats.stream().collect(Collectors.toMap(
-                    EndpointHitResponseDto::getUri,
-                    EndpointHitResponseDto::getHits
-            ));
+            List<EndpointHitResponseDto> stats = gson.fromJson(gson.toJson(responseEntity.getBody()), new TypeToken<List<EndpointHitResponseDto>>() {}.getType());
+            return stats.stream().collect(Collectors.toMap(EndpointHitResponseDto::getUri, EndpointHitResponseDto::getHits));
         }
-
         return new HashMap<>();
     }
 }

@@ -9,7 +9,6 @@ import ru.practicum.main.exception.model.EntityNotFoundException;
 import ru.practicum.main.user.dto.NewUserRequestDto;
 import ru.practicum.main.user.dto.UserDto;
 import ru.practicum.main.user.mapper.UserMapper;
-import ru.practicum.main.user.model.User;
 import ru.practicum.main.user.repository.UserRepository;
 
 import java.util.List;
@@ -24,8 +23,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<UserDto> getAllUsers(List<Long> ids, PageRequest pageRequest) {
-        List<User> users = userRepository.getAllOrIdInUsers(ids, pageRequest);
-        return users.stream().map(UserMapper::toDto).collect(Collectors.toList());
+        return userRepository.getAllOrIdInUsers(ids, pageRequest).stream().map(UserMapper::toDto).collect(Collectors.toList());
     }
 
     @Override
@@ -34,14 +32,13 @@ public class UserServiceImpl implements UserService {
         if (Objects.nonNull(userRepository.findByName(newUserRequestDto.getName()))) {
             throw new EntityConflictException("user", null);
         }
-        User user = UserMapper.toEntity(newUserRequestDto);
-        return UserMapper.toDto(userRepository.save(user));
+
+        return UserMapper.toDto(userRepository.save(UserMapper.toEntity(newUserRequestDto)));
     }
 
     @Override
     @Transactional
     public void deleteUser(Long userId) {
-        User user = userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException("user", userId));
-        userRepository.delete(user);
+        userRepository.delete(userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException("user", userId)));
     }
 }
