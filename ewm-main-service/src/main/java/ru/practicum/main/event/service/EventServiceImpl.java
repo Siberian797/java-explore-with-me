@@ -54,16 +54,13 @@ public class EventServiceImpl implements EventService {
     @Override
     public EventFullDto readPublicEvent(Long eventId, HttpServletRequest request) {
         CommonUtils.makePublicEndpointHit(statsClient, request);
-        return parseToFullDtoWithMappers(
-                eventRepository.findByIdAndPublished(eventId).orElseThrow(() -> new EntityNotFoundException("event", eventId)));
+        return parseToFullDtoWithMappers(eventRepository.findByIdAndPublished(eventId).orElseThrow(() -> new EntityNotFoundException("event", eventId)));
     }
 
 
     @Override
-    public List<EventFullDto> getAllEventsForAdmin(
-            List<Long> users, List<CommonConstants.EventState> states, List<Long> categories, LocalDateTime rangeStart,
-            LocalDateTime rangeEnd, PageRequest pageRequest) {
-
+    public List<EventFullDto> getAllEventsForAdmin(List<Long> users, List<CommonConstants.EventState> states, List<Long> categories,
+                                                   LocalDateTime rangeStart, LocalDateTime rangeEnd, PageRequest pageRequest) {
         return eventRepository.getEventsForAdmin(users, states, categories, rangeStart, rangeEnd, pageRequest).stream()
                 .map(this::parseToFullDtoWithMappers).collect(Collectors.toList());
     }
@@ -78,8 +75,7 @@ public class EventServiceImpl implements EventService {
                 throw new EntityNotValidException("event", null);
             }
         }
-
-        checkEventState(event.getState());
+        validateEventState(event.getState());
         updateEvent(updateEventRequest, event);
 
         Optional.ofNullable(updateEventRequest.getStateAction()).ifPresent(state -> {
@@ -106,49 +102,47 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public List<EventShortDto> getAllEventsForUser(Long userId, PageRequest pageRequest) {
-        CommonUtils.checkAndReturnUser(userRepository, userId);
+        CommonUtils.validateUser(userRepository, userId);
 
-        List<Event> events = eventRepository.getByInitiatorIdOrderByEventDateDesc(userId, pageRequest);
-
-        return events.stream().map(this::parseToShortDtoWithMappers).collect(Collectors.toList());
+        return eventRepository.getByInitiatorIdOrderByEventDateDesc(userId, pageRequest).stream()
+                .map(this::parseToShortDtoWithMappers).collect(Collectors.toList());
     }
 
     @Override
     @Transactional
     public EventFullDto createEvent(Long userId, NewEventDto newEventDto) {
-        checkEventDate(newEventDto.getEventDate());
+        validateEventDate(newEventDto.getEventDate());
 
-        User user = CommonUtils.checkAndReturnUser(userRepository, userId);
+        User user = CommonUtils.validateUser(userRepository, userId);
         Location location = findOrCreateLocation(locationRepository, newEventDto.getLocation());
-        Category category = categoryRepository.findById(newEventDto.getCategory())
-                .orElseThrow(() -> new EntityNotFoundException("category", newEventDto.getCategory()));
+        Category category = categoryRepository.findById(newEventDto.getCategory()).orElseThrow(() ->
+                new EntityNotFoundException("category", newEventDto.getCategory()));
 
-        Event event = EventMapper.toEntity(newEventDto, category, location, user);
-        return parseToFullDtoWithMappers(eventRepository.save(event));
+        return parseToFullDtoWithMappers(eventRepository.save(EventMapper.toEntity(newEventDto, category, location, user)));
     }
 
     @Override
     public EventFullDto readEvent(Long userId, Long eventId) {
-        return parseToFullDtoWithMappers(eventRepository.findByInitiatorIdAndId(userId, eventId)
-                .orElseThrow(() -> new EntityNotFoundException("event", eventId)));
+        return parseToFullDtoWithMappers(eventRepository.findByInitiatorIdAndId(userId, eventId).orElseThrow(() ->
+                new EntityNotFoundException("event", eventId)));
     }
 
     @Override
     @Transactional
-    public EventFullDto updateUserEvent(
-            Long userId, Long eventId, UpdateEventRequest<CommonConstants.EventStateUserAction> updateEventRequest) {
-
+    public EventFullDto updateUserEvent(Long userId, Long eventId, UpdateEventRequest<CommonConstants.EventStateUserAction> updateEventRequest) {
         if (Objects.nonNull(updateEventRequest.getEventDate())) {
             if (updateEventRequest.getEventDate().isBefore(LocalDateTime.now())) {
                 throw new EntityNotValidException("event", null);
             }
         }
 
-        Event event = eventRepository.findByInitiatorIdAndId(userId, eventId)
-                .orElseThrow(() -> new EntityNotFoundException("event", eventId));
+        Event event = eventRepository.findByInitiatorIdAndId(userId, eventId).orElseThrow(() -> new EntityNotFoundException("event", eventId));
 
-        checkEventInitiator(userId, event.getInitiator());
-        checkEventState(event.getState());
+        if (!Objects.equals(userId, event.getInitiator().getId())) {
+            throw new EntityConflictException("initiator", event.getInitiator().getId());
+        }
+
+        validateEventState(event.getState());
         updateEvent(updateEventRequest, event);
 
         Optional.ofNullable(updateEventRequest.getStateAction()).ifPresent(state -> {
@@ -169,10 +163,9 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    public List<EventShortDto> getAllPublicEvents(
-            String text, List<Long> categories, Boolean paid, LocalDateTime rangeStart, LocalDateTime rangeEnd,
-            Boolean onlyAvailable, CommonConstants.EventSort sort, Integer from, Integer size, HttpServletRequest request) {
-
+    public List<EventShortDto> getAllPublicEvents(String text, List<Long> categories, Boolean paid,
+                                                  LocalDateTime rangeStart, LocalDateTime rangeEnd, Boolean onlyAvailable,
+                                                  CommonConstants.EventSort sort, Integer from, Integer size, HttpServletRequest request) {
         if (rangeEnd.isBefore(rangeStart)) {
             throw new EntityNotValidException("range", null);
         }
@@ -188,40 +181,27 @@ public class EventServiceImpl implements EventService {
         }
 
         if (Boolean.TRUE.equals(onlyAvailable)) {
-            events =
-                    eventRepository.getAvailableEventsForUser(text, categories, paid, rangeStart, rangeEnd, pageRequest);
+            events = eventRepository.getAvailableEventsForUser(text, categories, paid, rangeStart, rangeEnd, pageRequest);
         } else {
             events = eventRepository.getEventsForUser(categories, pageRequest);
         }
 
         if (sort == CommonConstants.EventSort.VIEWS) {
-            sortEventsByViews(events);
+            List<String> uris = events.stream().map(event -> EVENTS_PREFIX + event.getId()).collect(Collectors.toList());
+
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern(CommonConstants.COMMON_JSON_DATETIME_FORMAT);
+            String start = LocalDateTime.now().minusYears(10).format(formatter);
+            String end = LocalDateTime.now().plusYears(10).format(formatter);
+            Map<String, Long> stats = CommonUtils.getViews(statsClient, start, end, uris, false);
+
+            events.sort((a, b) -> stats.getOrDefault(EVENTS_PREFIX + b.getId(), 0L).compareTo(
+                    stats.getOrDefault(EVENTS_PREFIX + a.getId(), 0L)));
         }
 
         return events.stream().map(this::parseToShortDtoWithMappers).collect(Collectors.toList());
     }
 
-    private void sortEventsByViews(List<Event> events) {
-        Map<String, Long> stats = getEventStats(events);
-
-        events.sort((a, b) -> stats.getOrDefault(EVENTS_PREFIX + b.getId(), 0L)
-                .compareTo(stats.getOrDefault(EVENTS_PREFIX + a.getId(), 0L)));
-    }
-
-    private Map<String, Long> getEventStats(List<Event> events) {
-        List<String> uris = events
-                .stream()
-                .map(event -> EVENTS_PREFIX + event.getId())
-                .collect(Collectors.toList());
-
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(CommonConstants.COMMON_JSON_DATETIME_FORMAT);
-        String start = LocalDateTime.now().minusYears(10).format(formatter);
-        String end = LocalDateTime.now().plusYears(10).format(formatter);
-
-        return CommonUtils.getViews(statsClient, start, end, uris, false);
-    }
-
-    private void checkEventState(CommonConstants.EventState state) {
+    private void validateEventState(CommonConstants.EventState state) {
         if (state == CommonConstants.EventState.PUBLISHED) {
             throw new EntityConflictException("status", null);
         }
@@ -239,13 +219,7 @@ public class EventServiceImpl implements EventService {
         );
     }
 
-    private void checkEventInitiator(Long userId, User initiator) {
-        if (!Objects.equals(userId, initiator.getId())) {
-            throw new EntityConflictException("initiator", initiator.getId());
-        }
-    }
-
-    private void checkEventDate(LocalDateTime eventDate) {
+    private void validateEventDate(LocalDateTime eventDate) {
         if (LocalDateTime.now().plusHours(2).isAfter(eventDate)) {
             throw new EntityNotValidException("eventDate", null);
         }
@@ -253,12 +227,12 @@ public class EventServiceImpl implements EventService {
 
     private void updateEvent(UpdateEventRequest<?> updateEventRequest, Event event) {
         Optional.ofNullable(updateEventRequest.getAnnotation()).ifPresent(event::setAnnotation);
-        Optional.ofNullable(updateEventRequest.getCategory())
-                .ifPresent(categoryId -> event.setCategory(categoryRepository.findById(categoryId)
-                        .orElseThrow(() -> new EntityNotFoundException("category", categoryId))));
+        Optional.ofNullable(updateEventRequest.getCategory()).ifPresent(categoryId ->
+                event.setCategory(categoryRepository.findById(categoryId).orElseThrow(() ->
+                        new EntityNotFoundException("category", categoryId))));
         Optional.ofNullable(updateEventRequest.getDescription()).ifPresent(event::setDescription);
         Optional.ofNullable(updateEventRequest.getEventDate()).ifPresent(eventDate -> {
-            checkEventDate(eventDate);
+            validateEventDate(eventDate);
             event.setEventDate(eventDate);
         });
         Optional.ofNullable(updateEventRequest.getLocation())
@@ -270,10 +244,6 @@ public class EventServiceImpl implements EventService {
     }
 
     private Location findOrCreateLocation(LocationRepository locationRepository, LocationDto locationDto) {
-        Float lat = locationDto.getLat();
-        Float lon = locationDto.getLon();
-
-        return locationRepository.findByLocation(lat, lon)
-                .orElse(locationRepository.save(LocationMapper.toEntity(locationDto)));
+        return locationRepository.findByLocation(locationDto.getLat(), locationDto.getLon()).orElse(locationRepository.save(LocationMapper.toEntity(locationDto)));
     }
 }

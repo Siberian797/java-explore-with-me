@@ -35,7 +35,7 @@ public class RequestServiceImpl implements RequestService {
 
     @Override
     public List<ParticipationRequestDto> getAllRequests(Long userId) {
-        CommonUtils.checkAndReturnUser(userRepository, userId);
+        CommonUtils.validateUser(userRepository, userId);
         List<Request> requests = requestRepository.findByRequesterId(userId);
         return requests.stream().map(RequestMapper::toDto).collect(Collectors.toList());
     }
@@ -44,7 +44,7 @@ public class RequestServiceImpl implements RequestService {
     @Transactional
     public ParticipationRequestDto createRequest(Long userId, Long eventId) {
         Event event = checkAndReturnEvent(eventRepository, eventId);
-        User user = CommonUtils.checkAndReturnUser(userRepository, userId);
+        User user = CommonUtils.validateUser(userRepository, userId);
 
         if (Boolean.TRUE.equals(requestRepository.existsByEventIdAndRequesterId(event.getId(), userId))) {
             throw new EntityConflictException("request", event.getId());
@@ -76,7 +76,7 @@ public class RequestServiceImpl implements RequestService {
     @Override
     @Transactional
     public ParticipationRequestDto cancelUserRequest(Long userId, Long requestId) {
-        User user = CommonUtils.checkAndReturnUser(userRepository, userId);
+        User user = CommonUtils.validateUser(userRepository, userId);
         Request request = checkAndReturnRequest(requestId);
 
         if (!user.getId().equals(request.getRequester().getId())) {

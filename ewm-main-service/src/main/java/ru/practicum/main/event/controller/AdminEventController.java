@@ -28,8 +28,7 @@ public class AdminEventController {
                                                @RequestParam(defaultValue = "#{T(java.time.LocalDateTime).now().plusYears(50)}") @DateTimeFormat(pattern = CommonConstants.COMMON_JSON_DATETIME_FORMAT) LocalDateTime rangeEnd,
                                                @RequestParam(defaultValue = "0") Integer from,
                                                @RequestParam(defaultValue = "10") Integer size) {
-        return eventService.getAllEventsForAdmin(
-                users, states, categories, rangeStart, rangeEnd, PageRequest.of(from, size));
+        return eventService.getAllEventsForAdmin(users, states, categories, rangeStart, rangeEnd, PageRequest.of(from, size));
     }
 
     @PatchMapping("/{eventId}")

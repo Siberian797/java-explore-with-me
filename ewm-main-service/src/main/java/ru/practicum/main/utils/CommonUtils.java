@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 public class CommonUtils {
     private static final Gson gson = new Gson();
 
-    public static User checkAndReturnUser(UserRepository userRepository, Long userId) {
+    public static User validateUser(UserRepository userRepository, Long userId) {
         return userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException("user", userId));
     }
 
