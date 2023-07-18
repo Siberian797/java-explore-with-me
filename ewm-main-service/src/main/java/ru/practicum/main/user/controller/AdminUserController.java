@@ -26,18 +26,21 @@ public class AdminUserController {
     public List<UserDto> getUsers(@RequestParam(required = false) List<Long> ids,
                                   @RequestParam(defaultValue = "0") @PositiveOrZero Integer from,
                                   @RequestParam(defaultValue = "10") @Positive Integer size) {
+        log.info("GET-users (admin) has been called");
         return userService.getAllUsers(ids, PageRequest.of(from, size));
     }
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
     public UserDto createUser(@RequestBody @Validated NewUserRequestDto newUserRequestDto) {
+        log.info("POST-users (admin) has been called");
         return userService.createUser(newUserRequestDto);
     }
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping("/{userId}")
     public void deleteUser(@PathVariable Long userId) {
+        log.info("DELETE-users (admin) has been called");
         userService.deleteUser(userId);
     }
 }
