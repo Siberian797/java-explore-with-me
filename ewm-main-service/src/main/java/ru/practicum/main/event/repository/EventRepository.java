@@ -15,7 +15,6 @@ import java.util.Optional;
 import java.util.Set;
 
 public interface EventRepository extends JpaRepository<Event, Long> {
-    @Query("SELECT COUNT(e) FROM Event e WHERE e.category.id = ?1")
     long countByCategoryId(Long categoryId);
 
     Optional<Event> findByInitiatorIdAndId(Long initiatorId, Long eventId);
@@ -71,6 +70,6 @@ public interface EventRepository extends JpaRepository<Event, Long> {
     );
 
 
-    @Query("SELECT e from Event e where e.id = :eventId and e.state = 'PUBLISHED'")
-    Optional<Event> findByIdAndPublished(@Param("eventId") Long eventId);
+    @Query("SELECT e from Event e where e.id = ?1 and e.state = 'PUBLISHED'")
+    Optional<Event> findByIdAndPublished(Long eventId);
 }
