@@ -21,4 +21,12 @@ public class CommonConstants {
     public enum EventStateUserAction {
         SEND_TO_REVIEW, CANCEL_REVIEW
     }
+
+    public enum NewRequestStatus {
+        CONFIRMED, REJECTED
+    }
+
+    public enum RequestStatus {
+        PENDING, CONFIRMED, REJECTED, CANCELED
+    }
 }

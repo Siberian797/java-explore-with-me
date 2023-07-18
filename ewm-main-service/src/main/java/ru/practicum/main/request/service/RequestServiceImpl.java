@@ -7,8 +7,6 @@ import ru.practicum.main.event.model.Event;
 import ru.practicum.main.event.repository.EventRepository;
 import ru.practicum.main.exception.model.EntityConflictException;
 import ru.practicum.main.exception.model.EntityNotFoundException;
-import ru.practicum.main.request.constant.NewRequestStatus;
-import ru.practicum.main.request.constant.RequestStatus;
 import ru.practicum.main.request.dto.EventRequestStatusUpdateRequest;
 import ru.practicum.main.request.dto.EventRequestStatusUpdateResult;
 import ru.practicum.main.request.dto.ParticipationRequestDto;
@@ -34,16 +32,9 @@ public class RequestServiceImpl implements RequestService {
     private final EventRepository eventRepository;
 
     @Override
-    public List<ParticipationRequestDto> getAllRequests(Long userId) {
-        CommonUtils.validateUser(userRepository, userId);
-        List<Request> requests = requestRepository.findByRequesterId(userId);
-        return requests.stream().map(RequestMapper::toDto).collect(Collectors.toList());
-    }
-
-    @Override
     @Transactional
     public ParticipationRequestDto createRequest(Long userId, Long eventId) {
-        Event event = checkAndReturnEvent(eventRepository, eventId);
+        Event event = eventRepository.findById(eventId).orElseThrow(() -> new EntityNotFoundException("event", eventId));
         User user = CommonUtils.validateUser(userRepository, userId);
 
         if (Boolean.TRUE.equals(requestRepository.existsByEventIdAndRequesterId(event.getId(), userId))) {
@@ -68,8 +59,8 @@ public class RequestServiceImpl implements RequestService {
                 .requester(user)
                 .event(event)
                 .created(LocalDateTime.now())
-                .status(event.getParticipantLimit() == 0 ? RequestStatus.CONFIRMED :
-                        Boolean.TRUE.equals(event.getRequestModeration()) ? RequestStatus.PENDING : RequestStatus.CONFIRMED)
+                .status(event.getParticipantLimit() == 0 ? CommonConstants.RequestStatus.CONFIRMED :
+                        Boolean.TRUE.equals(event.getRequestModeration()) ? CommonConstants.RequestStatus.PENDING : CommonConstants.RequestStatus.CONFIRMED)
                 .build()));
     }
 
@@ -77,31 +68,30 @@ public class RequestServiceImpl implements RequestService {
     @Transactional
     public ParticipationRequestDto cancelUserRequest(Long userId, Long requestId) {
         User user = CommonUtils.validateUser(userRepository, userId);
-        Request request = checkAndReturnRequest(requestId);
+        Request request = requestRepository.findById(requestId).orElseThrow(() ->
+                new EntityNotFoundException("request", requestId));
 
         if (!user.getId().equals(request.getRequester().getId())) {
             throw new EntityConflictException("requester", request.getRequester().getId());
         }
 
-        request.setStatus(RequestStatus.CANCELED);
+        request.setStatus(CommonConstants.RequestStatus.CANCELED);
         return RequestMapper.toDto(request);
     }
 
     @Override
     public List<ParticipationRequestDto> getUserEventRequests(Long userId, Long eventId) {
-        List<Request> requests = requestRepository.findByEventInitiatorIdAndEventId(userId, eventId);
-        return requests.stream().map(RequestMapper::toDto).collect(Collectors.toList());
+        return requestRepository.findByEventInitiatorIdAndEventId(userId, eventId).stream().map(RequestMapper::toDto).collect(Collectors.toList());
     }
 
     @Override
     @Transactional
     public EventRequestStatusUpdateResult updateRequest(
             Long userId, Long eventId, EventRequestStatusUpdateRequest eventRequestStatusUpdateRequest) {
-
         List<ParticipationRequestDto> confirmedRequests = new ArrayList<>();
         List<ParticipationRequestDto> rejectedRequests = new ArrayList<>();
 
-        Event event = checkAndReturnEvent(eventRepository, eventId);
+        Event event = eventRepository.findById(eventId).orElseThrow(() -> new EntityNotFoundException("event", eventId));
 
         if (event.getParticipants().size() >= event.getParticipantLimit()) {
             throw new EntityConflictException("event", eventId);
@@ -118,13 +108,13 @@ public class RequestServiceImpl implements RequestService {
                 return;
             }
 
-            if (eventRequestStatusUpdateRequest.getStatus() == NewRequestStatus.REJECTED) {
-                request.setStatus(RequestStatus.REJECTED);
+            if (eventRequestStatusUpdateRequest.getStatus() == CommonConstants.NewRequestStatus.REJECTED) {
+                request.setStatus(CommonConstants.RequestStatus.REJECTED);
                 rejectedRequests.add(RequestMapper.toDto(request));
             }
 
-            if (eventRequestStatusUpdateRequest.getStatus() == NewRequestStatus.CONFIRMED) {
-                request.setStatus(RequestStatus.CONFIRMED);
+            if (eventRequestStatusUpdateRequest.getStatus() == CommonConstants.NewRequestStatus.CONFIRMED) {
+                request.setStatus(CommonConstants.RequestStatus.CONFIRMED);
                 confirmedRequests.add(RequestMapper.toDto(request));
             }
         });
@@ -133,12 +123,10 @@ public class RequestServiceImpl implements RequestService {
                 .rejectedRequests(rejectedRequests).build();
     }
 
-    private Request checkAndReturnRequest(Long requestId) {
-        return requestRepository.findById(requestId).orElseThrow(() ->
-                new EntityNotFoundException("request", requestId));
-    }
-
-    private Event checkAndReturnEvent(EventRepository eventRepository, Long eventId) {
-        return eventRepository.findById(eventId).orElseThrow(() -> new EntityNotFoundException("event", eventId));
+    @Override
+    public List<ParticipationRequestDto> getAllRequests(Long userId) {
+        CommonUtils.validateUser(userRepository, userId);
+        List<Request> requests = requestRepository.findByRequesterId(userId);
+        return requests.stream().map(RequestMapper::toDto).collect(Collectors.toList());
     }
 }

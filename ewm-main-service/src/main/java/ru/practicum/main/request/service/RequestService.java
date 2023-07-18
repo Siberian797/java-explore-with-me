@@ -7,8 +7,6 @@ import ru.practicum.main.request.dto.ParticipationRequestDto;
 import java.util.List;
 
 public interface RequestService {
-    List<ParticipationRequestDto> getAllRequests(Long userId);
-
     ParticipationRequestDto createRequest(Long userId, Long eventId);
 
     ParticipationRequestDto cancelUserRequest(Long userId, Long requestId);
@@ -17,4 +15,6 @@ public interface RequestService {
 
     EventRequestStatusUpdateResult updateRequest(
             Long userId, Long eventId, EventRequestStatusUpdateRequest eventRequestStatusUpdateRequest);
+
+    List<ParticipationRequestDto> getAllRequests(Long userId);
 }

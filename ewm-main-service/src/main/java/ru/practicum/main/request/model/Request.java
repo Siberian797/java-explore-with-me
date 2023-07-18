@@ -2,8 +2,8 @@ package ru.practicum.main.request.model;
 
 import lombok.*;
 import ru.practicum.main.event.model.Event;
-import ru.practicum.main.request.constant.RequestStatus;
 import ru.practicum.main.user.model.User;
+import ru.practicum.main.utils.CommonConstants;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -31,7 +31,7 @@ public class Request {
 
     @Column
     @Enumerated(EnumType.STRING)
-    private RequestStatus status;
+    private CommonConstants.RequestStatus status;
 
     @Column
     private LocalDateTime created;
