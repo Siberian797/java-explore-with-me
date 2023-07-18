@@ -9,7 +9,7 @@ drop table if exists locations;
 create table if not exists users (
     id    serial primary key,
     email varchar(254) not null unique,
-    name  varchar(50) not null);
+    name  varchar(250) not null);
 
 create table if not exists compilations (
     id     serial primary key,
