@@ -39,56 +39,49 @@ public class CompilationServiceImpl implements CompilationService {
         Set<Event> events = Objects.isNull(newCompilationDto.getEvents()) ? Set.of() : eventRepository.getByIdIn(newCompilationDto.getEvents());
         Compilation compilation = CompilationMapper.toEntity(newCompilationDto, events);
 
-        return CompilationMapper.toDto(compilationRepository.save(compilation), parseEventsToDto(events));
+        return CompilationMapper.toDto(compilationRepository.save(compilation), parseEventsToShortDtos(events));
     }
 
     @Override
     public CompilationDto readCompilation(Long compilationId) {
-        Compilation compilation = checkAndReturnCompilation(compilationId);
-
-        return CompilationMapper.toDto(compilation, parseEventsToDto(compilation.getEvents()));
+        Compilation compilation = validateCompilation(compilationId);
+        return CompilationMapper.toDto(compilation, parseEventsToShortDtos(compilation.getEvents()));
     }
 
     @Override
     public CompilationDto updateCompilation(Long compilationId, UpdateCompilationRequestDto updateCompilationRequestDto) {
-        Compilation compilation = checkAndReturnCompilation(compilationId);
+        Compilation compilation = validateCompilation(compilationId);
 
         Optional.ofNullable(updateCompilationRequestDto.getTitle()).ifPresent(compilation::setTitle);
         Optional.ofNullable(updateCompilationRequestDto.getPinned()).ifPresent(compilation::setPinned);
-        Optional.ofNullable(updateCompilationRequestDto.getEvents())
-                .ifPresent(eventIds -> compilation.setEvents(eventRepository.getByIdIn(eventIds)));
+        Optional.ofNullable(updateCompilationRequestDto.getEvents()).ifPresent(eventIds -> compilation.setEvents(eventRepository.getByIdIn(eventIds)));
 
         return CompilationMapper.toDto(compilationRepository.save(compilation), null);
     }
 
     @Override
     public void deleteCompilation(Long compilationId) {
-        compilationRepository.delete(checkAndReturnCompilation(compilationId));
+        compilationRepository.delete(validateCompilation(compilationId));
     }
 
     @Override
     public List<CompilationDto> getAllCompilations(Boolean pinned, PageRequest pageRequest) {
         List<Compilation> compilations = compilationRepository.findByPinned(pinned, pageRequest);
 
-        return compilations.stream().map(compilation -> CompilationMapper.toDto(compilation, parseEventsToDto(compilation.getEvents())))
+        return compilations.stream().map(compilation -> CompilationMapper.toDto(compilation, parseEventsToShortDtos(compilation.getEvents())))
                 .collect(Collectors.toList());
     }
 
-    private Compilation checkAndReturnCompilation(Long compilationId) {
-        return compilationRepository.findById(compilationId)
-                .orElseThrow(() -> new EntityNotFoundException("compilation", compilationId));
+    private Compilation validateCompilation(Long compilationId) {
+        return compilationRepository.findById(compilationId).orElseThrow(() -> new EntityNotFoundException("compilation", compilationId));
     }
 
-    private List<EventShortDto> parseEventsToDto(Set<Event> events) {
+    private List<EventShortDto> parseEventsToShortDtos(Set<Event> events) {
         if (events.isEmpty()) {
             return List.of();
         }
 
-        return events.stream().map(event ->
-                EventMapper.toShortDto(
-                        event,
-                        CategoryMapper.toDto(event.getCategory()),
-                        UserMapper.toShortDto(event.getInitiator())
-                )).collect(Collectors.toList());
+        return events.stream().map(event -> EventMapper.toShortDto(event, CategoryMapper.toDto(event.getCategory()),
+                UserMapper.toShortDto(event.getInitiator()))).collect(Collectors.toList());
     }
 }

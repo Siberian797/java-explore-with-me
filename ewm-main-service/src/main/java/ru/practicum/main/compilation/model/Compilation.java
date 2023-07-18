@@ -20,19 +20,21 @@ import java.util.Set;
 public class Compilation {
     public static final String GRAPH_EVENT = "graph.Compilation.events";
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
     @ManyToMany(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
     @JoinTable(
             name = "compilation_events",
             joinColumns = @JoinColumn(name = "event_id"),
             inverseJoinColumns = @JoinColumn(name = "compilation_id")
     )
-    @ToString.Exclude
     private Set<Event> events;
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+
     @Column(nullable = false, length = 512)
     private String title;
+
     @Column(nullable = false)
     private Boolean pinned;
 }
