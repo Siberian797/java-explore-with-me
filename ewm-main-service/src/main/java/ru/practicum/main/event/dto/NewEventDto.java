@@ -17,16 +17,20 @@ import java.time.LocalDateTime;
 @Jacksonized
 public class NewEventDto {
     @NotBlank
+    @Size(min = 3, max = 120)
+    String title;
+
+    @NotBlank
+    @Size(min = 20, max = 7000)
+    String description;
+
+    @NotBlank
     @Size(min = 20, max = 2000)
     String annotation;
 
     @NotNull
     @Positive
     Long category;
-
-    @NotBlank
-    @Size(min = 20, max = 7000)
-    String description;
 
     @NotNull
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = CommonConstants.COMMON_JSON_DATETIME_FORMAT)
@@ -44,8 +48,4 @@ public class NewEventDto {
 
     @Builder.Default
     Boolean requestModeration = true;
-
-    @NotBlank
-    @Size(min = 3, max = 120)
-    String title;
 }

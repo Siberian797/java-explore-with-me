@@ -19,7 +19,6 @@ import ru.practicum.main.exception.model.EntityNotFoundException;
 import ru.practicum.main.user.mapper.UserMapper;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -32,11 +31,11 @@ public class CompilationServiceImpl implements CompilationService {
 
     @Override
     public CompilationDto createCompilation(NewCompilationDto newCompilationDto) {
-        if (Objects.isNull(newCompilationDto)) {
+        if (newCompilationDto == null) {
             throw new EntityConflictException("compilation", null);
         }
 
-        Set<Event> events = Objects.isNull(newCompilationDto.getEvents()) ? Set.of() : eventRepository.getByIdIn(newCompilationDto.getEvents());
+        Set<Event> events = newCompilationDto.getEvents() == null ? Set.of() : eventRepository.getByIdIn(newCompilationDto.getEvents());
         Compilation compilation = CompilationMapper.toEntity(newCompilationDto, events);
 
         return CompilationMapper.toDto(compilationRepository.save(compilation), parseEventsToShortDtos(events));
@@ -81,7 +80,10 @@ public class CompilationServiceImpl implements CompilationService {
             return List.of();
         }
 
-        return events.stream().map(event -> EventMapper.toShortDto(event, CategoryMapper.toDto(event.getCategory()),
-                UserMapper.toShortDto(event.getInitiator()))).collect(Collectors.toList());
+        return events.stream()
+                .map(event -> EventMapper.toShortDto(
+                        event,
+                        CategoryMapper.toDto(event.getCategory()),
+                        UserMapper.toShortDto(event.getInitiator()))).collect(Collectors.toList());
     }
 }
