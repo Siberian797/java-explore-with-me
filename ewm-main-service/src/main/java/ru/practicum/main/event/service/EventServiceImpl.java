@@ -1,7 +1,6 @@
 package ru.practicum.main.event.service;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -49,7 +48,7 @@ public class EventServiceImpl implements EventService {
     private final EventRepository eventRepository;
     private final UserRepository userRepository;
     private final CategoryRepository categoryRepository;
-    private final StatsClient statsClient = new StatsClient("stats-server.url", new RestTemplateBuilder());
+    private final StatsClient statsClient;
 
     @Override
     public EventFullDto getPublicEvent(Long eventId, HttpServletRequest request) {
