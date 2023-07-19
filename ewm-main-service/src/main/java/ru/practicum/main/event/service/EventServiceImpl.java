@@ -69,7 +69,7 @@ public class EventServiceImpl implements EventService {
     public EventFullDto updateAdminEvent(Long eventId, UpdateEventRequest<CommonConstants.EventStateAdminAction> updateEventRequest) {
         Event event = eventRepository.findById(eventId).orElseThrow(() -> new EntityNotFoundException("event", eventId));
 
-        if (Objects.nonNull(updateEventRequest.getEventDate())) {
+        if (updateEventRequest.getEventDate() != null) {
             if (updateEventRequest.getEventDate().isBefore(LocalDateTime.now())) {
                 throw new EntityNotValidException("event", null);
             }
@@ -129,7 +129,7 @@ public class EventServiceImpl implements EventService {
     @Override
     @Transactional
     public EventFullDto updateUserEvent(Long userId, Long eventId, UpdateEventRequest<CommonConstants.EventStateUserAction> updateEventRequest) {
-        if (Objects.nonNull(updateEventRequest.getEventDate())) {
+        if (updateEventRequest.getEventDate() != null) {
             if (updateEventRequest.getEventDate().isBefore(LocalDateTime.now())) {
                 throw new EntityNotValidException("event", null);
             }

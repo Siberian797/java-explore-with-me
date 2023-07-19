@@ -12,7 +12,6 @@ import ru.practicum.main.user.mapper.UserMapper;
 import ru.practicum.main.user.repository.UserRepository;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -29,7 +28,7 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public UserDto createUser(NewUserRequestDto newUserRequestDto) {
-        if (Objects.nonNull(userRepository.findByName(newUserRequestDto.getName()))) {
+        if (userRepository.findByName(newUserRequestDto.getName()) != null) {
             throw new EntityConflictException("user", null);
         }
 
