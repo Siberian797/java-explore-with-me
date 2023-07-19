@@ -1,6 +1,7 @@
 package ru.practicum.main.event.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Value;
@@ -15,6 +16,7 @@ import java.time.LocalDateTime;
 @Builder
 @AllArgsConstructor
 @Jacksonized
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class NewEventDto {
     @NotBlank
     @Size(min = 3, max = 120)
