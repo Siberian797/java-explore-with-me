@@ -14,11 +14,11 @@ import java.time.LocalDateTime;
 public class EventShortDto {
     Long id;
     String annotation;
-    transient CategoryDto category;
+    CategoryDto category;
     Integer confirmedRequests;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = CommonConstants.COMMON_JSON_DATETIME_FORMAT)
     LocalDateTime eventDate;
-    transient UserShortDto initiator;
+    UserShortDto initiator;
     Boolean paid;
     String title;
     Integer views;

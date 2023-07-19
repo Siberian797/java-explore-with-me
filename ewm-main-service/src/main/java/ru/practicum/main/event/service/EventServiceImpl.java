@@ -52,7 +52,7 @@ public class EventServiceImpl implements EventService {
     private final StatsClient statsClient = new StatsClient("http://stats-server:9090", new RestTemplateBuilder());
 
     @Override
-    public EventFullDto readPublicEvent(Long eventId, HttpServletRequest request) {
+    public EventFullDto getPublicEvent(Long eventId, HttpServletRequest request) {
         CommonUtils.makePublicEndpointHit(statsClient, request);
         return parseToFullDtoWithMappers(eventRepository.findByIdAndPublished(eventId).orElseThrow(() -> new EntityNotFoundException("event", eventId)));
     }
@@ -122,7 +122,7 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    public EventFullDto readEvent(Long userId, Long eventId) {
+    public EventFullDto getEvent(Long userId, Long eventId) {
         return parseToFullDtoWithMappers(eventRepository.findByInitiatorIdAndId(userId, eventId).orElseThrow(() ->
                 new EntityNotFoundException("event", eventId)));
     }

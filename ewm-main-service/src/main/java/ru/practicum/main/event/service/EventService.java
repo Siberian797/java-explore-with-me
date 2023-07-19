@@ -19,9 +19,9 @@ public interface EventService {
 
     EventFullDto createEvent(Long userId, NewEventDto newEventDto);
 
-    EventFullDto readEvent(Long userId, Long eventId);
+    EventFullDto getEvent(Long userId, Long eventId);
 
-    EventFullDto readPublicEvent(Long id, HttpServletRequest request);
+    EventFullDto getPublicEvent(Long id, HttpServletRequest request);
 
     EventFullDto updateUserEvent(Long userId, Long eventId, UpdateEventRequest<CommonConstants.EventStateUserAction> updateEventRequest);
 

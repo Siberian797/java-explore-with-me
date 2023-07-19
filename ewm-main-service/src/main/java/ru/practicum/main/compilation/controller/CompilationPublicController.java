@@ -31,6 +31,6 @@ public class CompilationPublicController {
     @GetMapping("/{id}")
     public CompilationDto getCompilationById(@PathVariable Long id) {
         log.info("GET-compilation (public) has been called");
-        return compilationService.readCompilation(id);
+        return compilationService.getCompilation(id);
     }
 }

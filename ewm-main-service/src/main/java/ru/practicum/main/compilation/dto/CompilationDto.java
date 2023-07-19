@@ -10,7 +10,7 @@ import java.util.List;
 @Builder
 public class CompilationDto {
     Long id;
-    transient List<EventShortDto> events;
+    List<EventShortDto> events;
     Boolean pinned;
     String title;
 }

@@ -45,7 +45,7 @@ public class PrivateEventController {
     public EventFullDto getUserEventById(@PathVariable Long userId,
                                          @PathVariable Long eventId) {
         log.info("GET-event (private) has been called");
-        return eventService.readEvent(userId, eventId);
+        return eventService.getEvent(userId, eventId);
     }
 
     @PatchMapping("/{eventId}")

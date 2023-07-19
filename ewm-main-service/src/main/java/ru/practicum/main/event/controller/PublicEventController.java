@@ -38,6 +38,6 @@ public class PublicEventController {
     @GetMapping("/{eventId}")
     public EventFullDto getPublicEventById(@PathVariable Long eventId, HttpServletRequest request) {
         log.info("GET-event (public) has been called");
-        return eventService.readPublicEvent(eventId, request);
+        return eventService.getPublicEvent(eventId, request);
     }
 }

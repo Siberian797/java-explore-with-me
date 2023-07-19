@@ -43,7 +43,7 @@ public class CompilationServiceImpl implements CompilationService {
     }
 
     @Override
-    public CompilationDto readCompilation(Long compilationId) {
+    public CompilationDto getCompilation(Long compilationId) {
         Compilation compilation = validateCompilation(compilationId);
         return CompilationMapper.toDto(compilation, parseEventsToShortDtos(compilation.getEvents()));
     }

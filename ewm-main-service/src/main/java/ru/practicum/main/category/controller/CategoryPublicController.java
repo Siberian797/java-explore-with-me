@@ -26,8 +26,8 @@ public class CategoryPublicController {
     }
 
     @GetMapping("/{categoryId}")
-    public CategoryDto readCategory(@PathVariable @Positive Long categoryId) {
+    public CategoryDto getCategory(@PathVariable @Positive Long categoryId) {
         log.info("GET-category (public) has been called");
-        return categoryService.readCategory(categoryId);
+        return categoryService.getCategory(categoryId);
     }
 }

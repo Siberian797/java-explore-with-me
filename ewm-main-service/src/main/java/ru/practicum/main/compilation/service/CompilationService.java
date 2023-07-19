@@ -10,7 +10,7 @@ import java.util.List;
 public interface CompilationService {
     CompilationDto createCompilation(NewCompilationDto newCompilationDto);
 
-    CompilationDto readCompilation(Long compilationId);
+    CompilationDto getCompilation(Long compilationId);
 
     CompilationDto updateCompilation(Long compilationId, UpdateCompilationRequestDto updateCompilationRequestDto);
 
