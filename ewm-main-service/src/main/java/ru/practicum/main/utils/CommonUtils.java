@@ -5,9 +5,6 @@ import com.google.gson.reflect.TypeToken;
 import lombok.experimental.UtilityClass;
 import org.springframework.http.ResponseEntity;
 import ru.practicum.client.StatsClient;
-import ru.practicum.main.exception.model.EntityNotFoundException;
-import ru.practicum.main.user.model.User;
-import ru.practicum.main.user.repository.UserRepository;
 import ru.practicum.stats.dto.EndpointHitRequestDto;
 import ru.practicum.stats.dto.EndpointHitResponseDto;
 
@@ -21,10 +18,6 @@ import java.util.stream.Collectors;
 @UtilityClass
 public class CommonUtils {
     private static final Gson gson = new Gson();
-
-    public static User validateUser(UserRepository userRepository, Long userId) {
-        return userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException("user", userId));
-    }
 
     public static void makePublicEndpointHit(StatsClient statsClient, HttpServletRequest request) {
         statsClient.createEndpointHit(EndpointHitRequestDto.builder()

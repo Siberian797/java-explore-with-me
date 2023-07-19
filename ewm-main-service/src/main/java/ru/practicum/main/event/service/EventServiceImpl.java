@@ -102,7 +102,7 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public List<EventShortDto> getAllEventsForUser(Long userId, PageRequest pageRequest) {
-        CommonUtils.validateUser(userRepository, userId);
+        validateUser(userId);
 
         return eventRepository.getByInitiatorIdOrderByEventDateDesc(userId, pageRequest).stream()
                 .map(this::parseToShortDtoWithMappers).collect(Collectors.toList());
@@ -113,7 +113,7 @@ public class EventServiceImpl implements EventService {
     public EventFullDto createEvent(Long userId, NewEventDto newEventDto) {
         validateEventDate(newEventDto.getEventDate());
 
-        User user = CommonUtils.validateUser(userRepository, userId);
+        User user = validateUser(userId);
         Location location = findOrCreateLocation(locationRepository, newEventDto.getLocation());
         Category category = categoryRepository.findById(newEventDto.getCategory()).orElseThrow(() ->
                 new EntityNotFoundException("category", newEventDto.getCategory()));
@@ -245,5 +245,9 @@ public class EventServiceImpl implements EventService {
 
     private Location findOrCreateLocation(LocationRepository locationRepository, LocationDto locationDto) {
         return locationRepository.findByLocation(locationDto.getLat(), locationDto.getLon()).orElse(locationRepository.save(LocationMapper.toEntity(locationDto)));
+    }
+
+    private User validateUser(Long userId) {
+        return userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException("user", userId));
     }
 }

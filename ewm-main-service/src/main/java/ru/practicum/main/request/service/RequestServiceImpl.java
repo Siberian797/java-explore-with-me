@@ -16,7 +16,6 @@ import ru.practicum.main.request.repository.RequestRepository;
 import ru.practicum.main.user.model.User;
 import ru.practicum.main.user.repository.UserRepository;
 import ru.practicum.main.utils.CommonConstants;
-import ru.practicum.main.utils.CommonUtils;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -35,7 +34,7 @@ public class RequestServiceImpl implements RequestService {
     @Transactional
     public ParticipationRequestDto createRequest(Long userId, Long eventId) {
         Event event = eventRepository.findById(eventId).orElseThrow(() -> new EntityNotFoundException("event", eventId));
-        User user = CommonUtils.validateUser(userRepository, userId);
+        User user = validateUser(userId);
 
         if (Boolean.TRUE.equals(requestRepository.existsByEventIdAndRequesterId(event.getId(), userId))) {
             throw new EntityConflictException("request", event.getId());
@@ -67,7 +66,7 @@ public class RequestServiceImpl implements RequestService {
     @Override
     @Transactional
     public ParticipationRequestDto cancelUserRequest(Long userId, Long requestId) {
-        User user = CommonUtils.validateUser(userRepository, userId);
+        User user = validateUser(userId);
         Request request = requestRepository.findById(requestId).orElseThrow(() ->
                 new EntityNotFoundException("request", requestId));
 
@@ -125,8 +124,12 @@ public class RequestServiceImpl implements RequestService {
 
     @Override
     public List<ParticipationRequestDto> getAllRequests(Long userId) {
-        CommonUtils.validateUser(userRepository, userId);
+        validateUser(userId);
         List<Request> requests = requestRepository.findByRequesterId(userId);
         return requests.stream().map(RequestMapper::toDto).collect(Collectors.toList());
+    }
+
+    private User validateUser(Long userId) {
+        return userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException("user", userId));
     }
 }
