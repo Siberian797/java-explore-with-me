@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.practicum.stats.dto.EndpointHitRequestDto;
 import ru.practicum.stats.dto.EndpointHitResponseDto;
+import ru.practicum.stats.server.exception.StartAfterEndException;
 import ru.practicum.stats.server.mapper.EndpointHitMapper;
 import ru.practicum.stats.server.model.StatUnit;
 import ru.practicum.stats.server.repository.StatsRepository;
@@ -24,6 +25,10 @@ public class StatsServiceImpl implements StatsService {
 
     @Override
     public List<EndpointHitResponseDto> getHits(LocalDateTime start, LocalDateTime end, List<String> uris, boolean unique) {
+        if (start.isAfter(end)) {
+            throw new StartAfterEndException();
+        }
+
         if (uris.isEmpty()) {
             return statsRepository.findByDate(start, end).stream().map(EndpointHitMapper::toDto).collect(Collectors.toList());
         }

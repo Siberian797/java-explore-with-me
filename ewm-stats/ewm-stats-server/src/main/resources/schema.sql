@@ -1,8 +1,8 @@
-CREATE TABLE IF NOT EXISTS stats
+create table if not exists stats
 (
-    id        serial PRIMARY KEY,
-    app       VARCHAR(255)                NOT NULL,
-    uri       VARCHAR(512)                NOT NULL,
-    ip        VARCHAR(255)                NOT NULL,
-    timestamp TIMESTAMP without TIME ZONE NOT NULL
+    id        serial primary key,
+    app       varchar(255)                not null,
+    uri       varchar(512)                not null,
+    ip        varchar(255)                not null,
+    timestamp timestamp without time zone not null
 );

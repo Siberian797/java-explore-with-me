@@ -1,25 +1,28 @@
 package ru.practicum.stats.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import lombok.Getter;
+import lombok.*;
 import org.springframework.format.annotation.DateTimeFormat;
 import ru.practicum.stats.dto.utils.CommonConstants;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-import java.io.Serializable;
 import java.time.LocalDateTime;
 
 @Getter
-public class EndpointHitRequestDto implements Serializable {
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor(force = true, access = AccessLevel.PRIVATE)
+@Value
+public class EndpointHitRequestDto {
     @NotBlank
-    private String app;
+    String app;
     @NotBlank
-    private String uri;
+    String uri;
     @NotBlank
-    private String ip;
+    String ip;
     @NotNull
     @DateTimeFormat(pattern = CommonConstants.COMMON_JSON_DATETIME_FORMAT)
-    @JsonFormat(pattern = CommonConstants.COMMON_JSON_DATETIME_FORMAT)
-    private LocalDateTime timestamp;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = CommonConstants.COMMON_JSON_DATETIME_FORMAT)
+    LocalDateTime timestamp;
 }
