@@ -108,25 +108,175 @@
     },
     {
       "name": "Получение коммента",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Ответ должен содержать код статуса 404 и данные в формате json\", function () {\r",
+              "    pm.response.to.be.notFound;    \r",
+              "    pm.response.to.be.withBody;\r",
+              "    pm.response.to.be.json;\r",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
       "request": {
         "method": "GET",
-        "header": []
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/comments/:commentId/",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "comments",
+            ":commentId",
+            ""
+          ],
+          "variable": [
+            {
+              "key": "commentId",
+              "value": "1"
+            }
+          ]
+        }
       },
       "response": []
     },
     {
       "name": "Изменение коммента",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "exec": [
+              "const main = async () => {\r",
+              "    const api = new API(pm);\r",
+              "    const rnd = new RandomUtils();\r",
+              "\r",
+              "    try {\r",
+              "        const user = await api.addUser(rnd.getUser());\r",
+              "        const initiator = await api.addUser(rnd.getUser());\r",
+              "        const category = await api.addCategory(rnd.getCategory());\r",
+              "        let eventBody = rnd.getEvent(category.id);\r",
+              "        let event = await api.addEvent(initiator.id, eventBody);\r",
+              "        event = await api.publishEvent(event.id);\r",
+              "        \r",
+              "        await api.publishParticipationRequest(event.id, user.id);\r",
+              "\r",
+              "        pm.collectionVariables.set('uid', initiator.id);\r",
+              "        pm.collectionVariables.set('eid', event.id);\r",
+              "\r",
+              "    } catch(err) {\r",
+              "        console.error(\"Ошибка при подготовке тестовых данных.\", err);\r",
+              "    }\r",
+              "};\r",
+              "\r",
+              "const interval = setInterval(() => {}, 1000);\r",
+              "\r",
+              "setTimeout(async () => \r",
+              "    {\r",
+              "        try {\r",
+              "            await main();\r",
+              "        } catch (e) {\r",
+              "            console.error(e);\r",
+              "        } finally {\r",
+              "            clearInterval(interval);\r",
+              "        }\r",
+              "    },  \r",
+              "    100\r",
+              ")"
+            ],
+            "type": "text/javascript"
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Ответ должен содержать код статуса 500 и данные в формате json\", function () {\r",
+              "    pm.response.to.be.error;    \r",
+              "    pm.response.to.be.withBody;\r",
+              "    pm.response.to.be.json;\r",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
       "request": {
-        "method": "GET",
-        "header": []
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{ \r\n    \"id\": 1,\r\n    \"eventId\": 1,\r\n    \"text\": \"description2\",\r\n    \"commentatorId\": 1\r\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/events/:id/comments",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "events",
+            ":id",
+            "comments"
+          ],
+          "variable": [
+            {
+              "key": "id",
+              "value": "1"
+            }
+          ]
+        }
       },
       "response": []
     },
     {
       "name": "Получение всех комментов",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Ответ должен содержать код статуса 500 и данные в формате json\", function () {\r",
+              "    pm.response.to.be.badRequest;    \r",
+              "    pm.response.to.be.withBody;\r",
+              "    pm.response.to.be.json;\r",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
       "request": {
         "method": "GET",
-        "header": []
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/comments/:commentId/",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "comments",
+            ":commentId",
+            ""
+          ],
+          "variable": [
+            {
+              "key": "commentId",
+              "value": null
+            }
+          ]
+        }
       },
       "response": []
     }
