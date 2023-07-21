@@ -1,6 +1,7 @@
 drop table if exists compilations;
 drop table if exists requests;
 drop table if exists compilation_events;
+drop table if exists comments;
 drop table if exists events;
 drop table if exists users;
 drop table if exists categories;
@@ -59,3 +60,11 @@ create table if not exists compilation_events (
     constraint ce_pk primary key (compilation_id, event_id),
     constraint cec_id_fk foreign key (compilation_id) references users,
     constraint cee_id_fk  foreign key (event_id) references events);
+
+create table if not exists comments (
+    id             serial primary key,
+    event_id       bigint               not null,
+    text           varchar(2000)        not null,
+    commentator_id bigint               not null,
+    constraint e_id_fk foreign key (event_id) references events,
+    constraint c_id_fk foreign key (commentator_id) references users);
