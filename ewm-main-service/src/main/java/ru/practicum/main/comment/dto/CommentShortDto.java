@@ -11,7 +11,6 @@ import javax.validation.constraints.Size;
 @Builder
 @AllArgsConstructor
 public class CommentShortDto {
-    @NotBlank
     Long id;
 
     @NotBlank
