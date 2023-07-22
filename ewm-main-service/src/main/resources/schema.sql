@@ -66,8 +66,8 @@ create table if not exists comments (
     event_id       bigint                      not null,
     text           varchar(2000)               not null,
     commentator_id bigint                      not null,
-    created_on     timestamp without time zone not null
-    edited_on      timestamp without time zone not null
+    created_on     timestamp without time zone not null,
+    edited_on      timestamp without time zone not null,
     constraint e_id_fk foreign key (event_id) references events,
     constraint pk_comments primary key (id),
     constraint c_id_fk foreign key (commentator_id) references users);
