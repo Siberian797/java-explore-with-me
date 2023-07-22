@@ -2,6 +2,7 @@ package ru.practicum.main.comment.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
+import ru.practicum.main.utils.CommonConstants;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -27,9 +28,11 @@ public class Comment {
     @Column(nullable = false, name = "commentator_id")
     private Long commentatorId;
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+    @Column(name = "created_on")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = CommonConstants.COMMON_JSON_DATETIME_FORMAT)
     private LocalDateTime createdOn;
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+    @Column(name = "edited_on")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = CommonConstants.COMMON_JSON_DATETIME_FORMAT)
     private LocalDateTime editedOn;
 }
