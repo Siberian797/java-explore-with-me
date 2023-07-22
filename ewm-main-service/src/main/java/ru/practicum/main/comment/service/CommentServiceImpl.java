@@ -13,6 +13,7 @@ import ru.practicum.main.exception.model.EntityNotFoundException;
 import ru.practicum.main.exception.model.EntityNotValidException;
 import ru.practicum.main.user.repository.UserRepository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -29,23 +30,25 @@ public class CommentServiceImpl implements CommentService {
         validateUser(userId);
         validateEvent(commentFullDto.getEventId());
 
-        return CommentMapper.toDto(commentRepository.save(CommentMapper.toEntity(commentFullDto)));
+        Comment comment = commentRepository.save(CommentMapper.toEntity(commentFullDto));
+        comment.setCreatedOn(LocalDateTime.now());
+
+        return CommentMapper.toDto(comment);
     }
 
     @Override
     public CommentFullDto getComment(Long commentId) {
-        return CommentMapper.toDto(
-                commentRepository.findById(commentId).orElseThrow(()
-                        -> new EntityNotFoundException("comment", commentId)));
+        return CommentMapper.toDto(getValidatedComment(commentId));
     }
 
     @Override
     public CommentFullDto updateComment(Long userId, CommentShortDto commentShortDto) {
         validateOwner(commentShortDto.getId(), userId);
 
-        Comment comment = commentRepository.findById(commentShortDto.getId()).orElseThrow(()
-                -> new EntityNotFoundException("comment", commentShortDto.getId()));
+        Comment comment = getValidatedComment(commentShortDto.getId());
         comment.setText(commentShortDto.getText());
+        comment.setEditedOn(LocalDateTime.now());
+
         return CommentMapper.toDto(comment);
     }
 
@@ -74,10 +77,14 @@ public class CommentServiceImpl implements CommentService {
 
     private void validateOwner(Long commentId, Long userId) {
         validateUser(userId);
-        Comment comment = commentRepository.findById(commentId)
-                .orElseThrow(() -> new EntityNotFoundException("comment", commentId));
+        Comment comment = getValidatedComment(commentId);
         if (!Objects.equals(comment.getCommentatorId(), userId)) {
             throw new EntityNotValidException("comment", commentId);
         }
+    }
+
+    private Comment getValidatedComment(Long commentId) {
+        return commentRepository.findById(commentId).orElseThrow(()
+                -> new EntityNotFoundException("comment", commentId));
     }
 }
